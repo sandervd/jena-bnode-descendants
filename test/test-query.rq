@@ -1,0 +1,9 @@
+PREFIX f: <java:eu.essentialcomplexity.sparql.pfunction.>
+PREFIX apf: <http://jena.apache.org/ARQ/property#>
+PREFIX afn: <http://jena.apache.org/ARQ/function#>
+PREFIX schema: <http://schema.org/>
+SELECT ?s ?x ?p ?o 
+{
+  <http://example.com/movies/1> f:bnodeDescendants ?x .
+  ?x ?p ?o .
+}
