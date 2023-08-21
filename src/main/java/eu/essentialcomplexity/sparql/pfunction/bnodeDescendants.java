@@ -49,20 +49,21 @@ public class bnodeDescendants extends PropertyFunctionEval
     {
         try 
         {
+            // Object must be unbound variable
             if ( !argObject.getArg().isVariable() )
             {
                 Log.warn(this, "Object to property function bnode descendants must be an unbound variable.") ;
                 return IterLib.noResults(execCxt) ;
             }
-            // Subject bound to something other a URI.
-            if ( argSubject.getArg().isLiteral() || argSubject.getArg().isBlank() )
+            // Subject bound to literal.
+            if ( argSubject.getArg().isLiteral() )
             {
                 // Only find blanknode descendants of IRIs.
                 Log.warn(this, "Subject to property function bnode descendants is not a URI.") ;
                 return IterLib.noResults(execCxt) ;
             }
-            if ( argSubject.getArg().isURI() )
-                // Case 1 : subject is a fixed URI or a variable bount to a URI.
+            if ( argSubject.getArg().isURI() || argSubject.getArg().isBlank() )
+                // Case 1 : subject is a fixed URI or a variable bound to a URI.
                 return subjectIsIRI(argSubject.getArg(), argObject, binding, execCxt) ;
             
             // Case 2 : subject is an unbound variable.
@@ -94,8 +95,12 @@ public class bnodeDescendants extends PropertyFunctionEval
             {
                 Triple t = iter.next();
                 Node objectNode = t.getObject() ;
-                if (objectNode.isBlank() && !objList.contains(objectNode.getBlankNodeId()))
+                if (objectNode.isBlank())
                 {
+                    if (objList.contains(objectNode.getBlankNodeId()))
+                    {
+                        Log.error(objectNode, "Cycle detected in blank nodes, illegal condition in CBD entity.");
+                    }
                     includedBNodes.push(objectNode);
                     objList.add(objectNode.getBlankNodeId());
                 }
